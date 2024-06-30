@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Storage</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Simple Storage Contract</h1>
+    <div>
+        <label for="value">Set Value:</label>
+        <input type="number" id="value" />
+        <button onclick="setValue()">Set</button>
+    </div>
+    <div>
+        <label for="str">Set String:</label>
+        <input type="text" id="str" />
+        <button onclick="setString()">Set</button>
+    </div>
+    <div>
+        <button onclick="getValue()">Get Value</button>
+        <p>Stored Value: <span id="storedValue"></span></p>
+    </div>
+    <div>
+        <button onclick="getString()">Get String</button>
+        <p>Stored String: <span id="storedString"></span></p>
+    </div>
+
+    <script>
+        // Ensure you have MetaMask installed and are connected to a network
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+
+        // Replace this with your deployed contract address
+        const contractAddress = "YOUR_CONTRACT_ADDRESS";
+        const contractABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "x",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "set",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "get",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "str",
+                        "type": "string"
+                    }
+                ],
+                "name": "setString",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getString",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        const simpleStorage = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function setValue() {
+            const accounts = await web3.eth.requestAccounts();
+            const value = document.getElementById("value").value;
+            await simpleStorage.methods.set(value).send({ from: accounts[0] });
+            alert("Value set successfully");
+        }
+
+        async function getValue() {
+            const value = await simpleStorage.methods.get().call();
+            document.getElementById("storedValue").innerText = value;
+        }
+
+        async function setString() {
+            const accounts = await web3.eth.requestAccounts();
+            const str = document.getElementById("str").value;
+            await simpleStorage.methods.setString(str).send({ from: accounts[0] });
+            alert("String set successfully");
+        }
+
+        async function getString() {
+            const str = await simpleStorage.methods.getString().call();
+            document.getElementById("storedString").innerText = str;
+        }
+    </script>
+</body>
+</html>
